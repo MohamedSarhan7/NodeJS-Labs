@@ -4,64 +4,71 @@ const userModel = require('../models/user');
 
 
 //  GET all users
-router.get('/', (req, res) => {
-    userModel.find({}, (err, users) => {
-        if (err) {
-            res.status(400).json("err");
-        }
-        res.json(users);
+router.get('/', async (req, res) => {
 
-    })
+    try {
+        const users = await userModel.find({});
+        res.json(users);
+    } catch (error) {
+        res.status(400).json("err");
+    }
 })
 
 //  GET user
-router.get('/:id', (req, res) => {
-    id = req.params.id;
-    // userModel.find({ _id: id })
-    userModel.findById(id, (err, user) => {
-        if (err) {
-            res.status(400).json("err");
-        }
-        res.json(user);
+router.get('/:id', async (req, res) => {
+    try {
 
-    })
+        id = req.params.id;
+        const user = await userModel.findById(id);
+        res.json(user);
+    } catch (error) {
+
+        res.status(400).json("err");
+    }
 })
 
 //  POST user
-router.post('/', (req, res) => {
-    if (req.body == {}) res.status(402).json("fields are required");
-    const user = req.body 
-    userModel.create(user, (err, savedUser) => {
-        if (!err) {
-            return res.json(savedUser);
-        }
+router.post('/', async (req, res) => {
+    if (req.body == {}) return res.status(402).json("fields are required");
+    try {
+        const user = req.body
+        const savedUSer = await userModel.create(user);
+
+        return res.json(savedUser);
+    } catch (error) {
+
         res.status(500).json("err");
-    })
+    }
 })
 
 //  PUT User
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
     id = req.params.id;
-    if (req.body == {}) res.status(402).json("fields are required");
-    const user =req.body ;
+    if (req.body == {}) return res.status(402).json("fields are required");
 
-    userModel.updateOne({ _id: id }, user, (err, updatedUser) => {
-        if (!err) {
-            return res.json(updatedUser);
-        }
-        res.status(500).json("err");
-    })
+    try {
+        const user = req.body;
+        const updatedUser = await userModel.updateOne({ _id: id }, user);
+        return res.json(updatedUser);
+    } catch (error) {
+
+        return res.status(500).json("err");
+    }
+
 })
 // DELETE user
 router.delete('/:id', (req, res) => {
     id = req.params.id;
+    try {
+        userModel.deleteOne({ _id: id }).then(() => {
 
-    userModel.deleteOne({ _id: id }, (err) => {
-        if (!err) {
             return res.json("Deleted");
-        }
-        res.status(500).json("err");
-    })
+        })
+    } catch (error) {
+        return res.status(500).json("err");
+
+    }
+
 })
 
 
